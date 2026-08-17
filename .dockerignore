@@ -1,8 +1,9 @@
-node_modules/
-.next/
+node_modules
+.next
+.git
+.gitignore
 .env
 .env.local
-.idea/
-.claude/
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+README.md

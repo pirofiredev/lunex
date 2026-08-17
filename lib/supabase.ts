@@ -1,9 +1,9 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const schema = process.env.NEXT_PUBLIC_SUPABASE_SCHEMA || "public";
+const schema = (process.env.NEXT_PUBLIC_SUPABASE_SCHEMA || "public") as "public";
 
 /**
  * Browser / client-component client. Safe to import anywhere on the client:
@@ -12,7 +12,7 @@ const schema = process.env.NEXT_PUBLIC_SUPABASE_SCHEMA || "public";
  *
  * Supports custom schema via NEXT_PUBLIC_SUPABASE_SCHEMA env var (e.g., "payload").
  */
-export function getSupabaseBrowserClient(): SupabaseClient | null {
+export function getSupabaseBrowserClient() {
   if (!url || !anonKey) return null;
   return createClient(url, anonKey, {
     db: { schema },
@@ -26,7 +26,7 @@ export function getSupabaseBrowserClient(): SupabaseClient | null {
  *
  * Supports custom schema via NEXT_PUBLIC_SUPABASE_SCHEMA env var (e.g., "payload").
  */
-export function getSupabaseServiceClient(): SupabaseClient | null {
+export function getSupabaseServiceClient() {
   if (!url || !serviceRoleKey) return null;
   return createClient(url, serviceRoleKey, {
     auth: { persistSession: false },
