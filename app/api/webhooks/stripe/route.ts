@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     const supabase = getSupabaseServiceClient();
     if (supabase) {
       // Write order to database
-      await supabase.from("orders").insert({
+      const { error: insertError } = await supabase.from("orders").insert({
         stripe_session_id: session.id,
         email: orderPayload.email,
         phone: orderPayload.phone,
@@ -87,6 +87,10 @@ export async function POST(req: NextRequest) {
         total_chf: orderPayload.totalCHF,
         status: "paid",
       });
+
+      if (insertError) {
+        console.error(`[Webhook] Failed to insert order ${session.id}:`, insertError);
+      }
 
       // Decrement stock for each purchased item
       // Line item names are formatted as "Product Name — SIZE" from checkout route
@@ -117,12 +121,12 @@ export async function POST(req: NextRequest) {
 
         const productId = products[0].id;
 
-        // Decrement stock in products_stock table
+        // Decrement stock in stock table (productid, size, quantity)
         // Database stores sizes in lowercase
         const { data: stockRow, error: fetchError } = await supabase
-          .from("products_stock")
+          .from("stock")
           .select("quantity")
-          .eq("_parent_id", productId)
+          .eq("productid", productId)
           .eq("size", size.toLowerCase())
           .single();
 
@@ -134,9 +138,9 @@ export async function POST(req: NextRequest) {
         const newQuantity = Math.max(0, stockRow.quantity - quantity);
 
         const { error: updateError } = await supabase
-          .from("products_stock")
+          .from("stock")
           .update({ quantity: newQuantity })
-          .eq("_parent_id", productId)
+          .eq("productid", productId)
           .eq("size", size.toLowerCase());
 
         if (updateError) {
