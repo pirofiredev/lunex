@@ -10,6 +10,9 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import { getProducts } from "@/lib/cms";
 
+// Never bake CMS data into static builds — fetch fresh on every request
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
